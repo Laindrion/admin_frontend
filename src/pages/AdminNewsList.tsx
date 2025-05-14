@@ -15,7 +15,7 @@ const AdminNewsList = () => {
    const [loading, setLoading] = useState(true);
    const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
-   const [editingId, setEditingId] = useState<number | null>(null);
+   const [editingId, setEditId] = useState<number | null>(null);
    const [editTitle, setEditTitle] = useState('');
    const [editDesc, setEditDesc] = useState('');
 
@@ -55,25 +55,44 @@ const AdminNewsList = () => {
    }
 
    const startEdit = (news: NewsItem) => {
-      setEditingId(news.id);
+      setEditId(news.id);
       setEditTitle(news.title);
       setEditDesc(news.shortDescription);
    }
 
    const handleSave = async (id: number) => {
-      try {
-         axios.put(`http://localhost:3001/api/news/${id}`, {
-            title: editTitle,
-            shortDescription: editDesc,
-         }, {
-            withCredentials: true,
-         })
 
-         setNewsList((prev) => prev.map((item) => item.id === id ? { ...item, title: editTitle, shortDescription: editDesc } : item));
-         setEditingId(null);
+      try {
+         const formData = new FormData();
+         formData.append("title", editTitle);
+         formData.append("shortDescription", editDesc);
+         if (editImage) formData.append("image", editImage);
+
+
+         await axios.put(`http://localhost:3001/api/news/${id}`, formData, {
+            withCredentials: true,
+            headers: {
+               "Content-Type": "multipart/form-data",
+            },
+         });
+
+         setNewsList((prev) =>
+            prev.map((item) =>
+               item.id === id
+                  ? {
+                     ...item,
+                     title: editTitle,
+                     shortDescription: editDesc,
+                     imagePath: editImage ? `/uploads${editImage.name}` : item.imagePath,
+                  } : item));
+
+         setEditImage(null);
+         setEditId(null);
       } catch (err) {
          console.error("Failed to update news", err);
+         alert("Update failed");
       }
+
    }
 
    if (isLoggedIn === false) return <Navigate to="/admin/login" replace />
@@ -120,7 +139,7 @@ const AdminNewsList = () => {
                            </button>
 
                            <button
-                              onClick={() => { setEditingId(null); }}
+                              onClick={() => { setEditId(null); }}
                               className="bg-gray-300 text-white px-3 py-2 rounded"
                            >
                               Cancel
@@ -133,9 +152,6 @@ const AdminNewsList = () => {
                            <h3 className="text-xl font-semibold">
                               {news.title}
                            </h3>
-                           <p className="text-gray-600">
-                              {news.shortDescription}
-                           </p>
 
                            <button
                               onClick={() => startEdit(news)}

@@ -1,12 +1,13 @@
-import React from 'react'
 import { useState, useEffect } from "react"
 import axios from 'axios'
+import { Link } from 'react-router-dom';
 
 type NewsItem = {
    id: number;
    title: string;
    shortDescription: string;
    imagePath: string;
+   content: string;
    createdAt: string;
 }
 
@@ -52,7 +53,9 @@ const PublicNews = () => {
                         className="w-full max-h-64 object-cover rounded mb-4" />
 
                      <h2 className="text-xl font-semibold mb-2">
-                        {item.title}
+                        <Link to={`/news/${item.id}`} className="text-blue-600 hover:underline">
+                           {item.title}
+                        </Link>
                      </h2>
 
                      <p className="text-gray-700">

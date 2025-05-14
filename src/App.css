@@ -1,4 +1,27 @@
-
-#root{
+#root {
    width: 100%;
+}
+
+div.tiptap {
+   min-height: 300px;
+   padding: 10px;
+}
+
+.editor-wrapper button {
+   padding: 0.25rem 0.5rem;
+   border: 1px solid #ddd;
+   background: #f8f8f8;
+   border-radius: 4px;
+   cursor: pointer;
+   font-size: 14px;
+}
+
+.editor-wrapper button.is-active {
+   background-color: #2563eb;
+   color: white;
+   border-color: #2563eb;
+}
+
+.editor-wrapper button:hover {
+   background-color: #e5e5e5;
 }

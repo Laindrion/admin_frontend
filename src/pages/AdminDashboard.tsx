@@ -1,14 +1,17 @@
-import React from 'react'
-import { useState, useEffect } from 'react'
-import axios from 'axios'
-import { Button } from '@/components/ui/button'
+import React from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Button } from '@/components/ui/button';
 import { Navigate } from 'react-router-dom';
+
+import TiptapEditor from '@/components/ui/editor';
 
 const AdminDashboard = () => {
    const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
    const [title, setTitle] = useState("");
    const [shortDescription, setShortDescription] = useState("");
    const [image, setImage] = useState<File | null>(null);
+   const [content, setContent] = useState("");
    const [message, setMessage] = useState("");
 
    const handleSubmit = async (e: React.FormEvent) => {
@@ -20,6 +23,7 @@ const AdminDashboard = () => {
       formData.append("title", title);
       formData.append("shortDescription", shortDescription);
       formData.append("image", image);
+      formData.append("content", content);
 
       try {
          const res = await axios.post("http://localhost:3001/api/news", formData, {
@@ -32,6 +36,7 @@ const AdminDashboard = () => {
          setMessage(res.data.message);
          setTitle("");
          setShortDescription("");
+         setContent("");
          setImage(null);
       } catch (err: any) {
          setMessage(err?.response?.data?.error || "Upload failed");
@@ -92,6 +97,8 @@ const AdminDashboard = () => {
                required
             ></textarea>
 
+            <TiptapEditor content={content} setContent={setContent} />
+
             <input
                type="file"
                accept="image/*"
@@ -100,7 +107,7 @@ const AdminDashboard = () => {
             />
             <Button
                type="submit"
-               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer"
             >
                Upload
             </Button>
@@ -108,7 +115,7 @@ const AdminDashboard = () => {
 
          <Button
             onClick={handleLogout}
-            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 mt-4 mb-4"
+            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 mt-4 mb-4 cursor-pointer"
          >
             Logout
          </Button>
