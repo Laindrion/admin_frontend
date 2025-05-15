@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Link, Navigate } from "react-router-dom";
 import TiptapEditor from "@/components/ui/editor";
+import { Button } from "@/components/ui/button";
 
 type NewsItem = {
    id: number;
@@ -101,21 +102,40 @@ const AdminNewsList = () => {
 
    }
 
+   const handleLogout = async () => {
+      try {
+         await axios.post("http://localhost:3001/api/auth/logout", {}, { withCredentials: true });
+
+         window.location.href = "/admin/login";
+      } catch (err) {
+         console.error("Logout failed:", err);
+      }
+   }
+
    if (isLoggedIn === false) return <Navigate to="/admin/login" replace />
    if (loading === null || loading) return <div className="text-center mt-10">Loading...</div>;
 
    return (
       <div className="max-w-4xl mx-auto mt-10 p-4">
-         <div className="flex justify-between">
-            <h2 className="text-2xl font-bold mb-6">
+         <div className="flex justify-between items-center mb-5">
+            <h2 className="text-2xl font-bold">
                Admin News Manager
             </h2>
 
-            <Link to={"/admin/create-news"}>
-               <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer transition">
-                  Create News
-               </button>
-            </Link>
+            <div className="flex gap-4 items-center">
+               <Link to={"/admin/create-news"}>
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer text-sm">
+                     Create News
+                  </button>
+               </Link>
+
+               <Button
+                  onClick={handleLogout}
+                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 cursor-pointer"
+               >
+                  Logout
+               </Button>
+            </div>
          </div>
 
 
@@ -139,6 +159,9 @@ const AdminNewsList = () => {
                               onChange={(e) => setEditTitle(e.target.value)}
                               className="w-full border p-2 mb-2 rounded"
                            />
+
+                           <textarea value={editDesc} onChange={(e) => setEditDesc(e.target.value)} className="w-full border p-2 mb-2 rounded">
+                           </textarea>
 
                            <TiptapEditor content={editContent} setContent={setEditContent} />
 
