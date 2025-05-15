@@ -15,7 +15,7 @@ createRoot(document.getElementById('root')!).render(
          <Routes>
             <Route path="/" element={<App />} />
             <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/create-news" element={<AdminDashboard />} />
             <Route path="/news" element={<PublicNews />} />
             <Route path="/admin/news-list" element={<AdminNewsList />} />
             <Route path="/news/:id" element={<PublicNewsDetails />} />

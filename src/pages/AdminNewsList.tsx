@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
-import axios from 'axios';
-import { Navigate } from 'react-router-dom';
+import axios from "axios";
+import { Link, Navigate } from "react-router-dom";
+import TiptapEditor from "@/components/ui/editor";
 
 type NewsItem = {
    id: number;
    title: string;
    shortDescription: string;
    imagePath: string;
+   content: string;
    createdAt: string;
 }
 
@@ -16,14 +18,15 @@ const AdminNewsList = () => {
    const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
    const [editingId, setEditId] = useState<number | null>(null);
-   const [editTitle, setEditTitle] = useState('');
-   const [editDesc, setEditDesc] = useState('');
+   const [editTitle, setEditTitle] = useState("");
+   const [editDesc, setEditDesc] = useState("");
+   const [editContent, setEditContent] = useState("");
 
    const [editImage, setEditImage] = useState<File | null>(null);
 
    useEffect(() => {
       // Check log in
-      axios.get('http://localhost:3001/api/auth/check', {
+      axios.get("http://localhost:3001/api/auth/check", {
          withCredentials: true,
       })
          .then(() => setIsLoggedIn(true))
@@ -58,6 +61,7 @@ const AdminNewsList = () => {
       setEditId(news.id);
       setEditTitle(news.title);
       setEditDesc(news.shortDescription);
+      setEditContent(news.content);
    }
 
    const handleSave = async (id: number) => {
@@ -66,8 +70,9 @@ const AdminNewsList = () => {
          const formData = new FormData();
          formData.append("title", editTitle);
          formData.append("shortDescription", editDesc);
-         if (editImage) formData.append("image", editImage);
+         formData.append("content", editContent);
 
+         if (editImage) formData.append("image", editImage);
 
          await axios.put(`http://localhost:3001/api/news/${id}`, formData, {
             withCredentials: true,
@@ -84,6 +89,7 @@ const AdminNewsList = () => {
                      title: editTitle,
                      shortDescription: editDesc,
                      imagePath: editImage ? `/uploads${editImage.name}` : item.imagePath,
+                     content: editContent
                   } : item));
 
          setEditImage(null);
@@ -100,9 +106,18 @@ const AdminNewsList = () => {
 
    return (
       <div className="max-w-4xl mx-auto mt-10 p-4">
-         <h2 className="text-2xl font-bold mb-6">
-            Admin News Manager
-         </h2>
+         <div className="flex justify-between">
+            <h2 className="text-2xl font-bold mb-6">
+               Admin News Manager
+            </h2>
+
+            <Link to={"/admin/create-news"}>
+               <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer transition">
+                  Create News
+               </button>
+            </Link>
+         </div>
+
 
          {newsList.length === 0 ? (
             <p>  No news available at the moment.</p>
@@ -124,23 +139,19 @@ const AdminNewsList = () => {
                               onChange={(e) => setEditTitle(e.target.value)}
                               className="w-full border p-2 mb-2 rounded"
                            />
-                           <textarea
-                              value={editDesc}
-                              onChange={(e) => { setEditDesc(e.target.value) }}
-                              className="w-full border p-2 mb-2 rounded"
-                           >
-                           </textarea>
+
+                           <TiptapEditor content={editContent} setContent={setEditContent} />
 
                            <button
                               onClick={() => handleSave(news.id)}
-                              className="bg-green-600 text-white px-3 py-2 mr-2 rounded hover:bg-green-700"
+                              className="bg-green-600 text-white px-3 py-2 mr-2 rounded hover:bg-green-700 cursor-pointer"
                            >
                               Save
                            </button>
 
                            <button
                               onClick={() => { setEditId(null); }}
-                              className="bg-gray-300 text-white px-3 py-2 rounded"
+                              className="bg-gray-300 text-white px-3 py-2 rounded cursor-pointer"
                            >
                               Cancel
                            </button>
@@ -155,12 +166,12 @@ const AdminNewsList = () => {
 
                            <button
                               onClick={() => startEdit(news)}
-                              className="mt-3 bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 mr-2"
+                              className="mt-3 bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 mr-2 cursor-pointer"
                            >
                               Edit
                            </button>
 
-                           <button onClick={() => handleDelete(news.id)} className="mt-3 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                           <button onClick={() => handleDelete(news.id)} className="mt-3 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 cursor-pointer">
                               Delete
                            </button>
                         </>

@@ -18,7 +18,7 @@ const AdminLogin = () => {
             { withCredentials: true }
          );
          setMessage(res.data.message);
-         navigate("/admin");
+         navigate("/admin/news-list");
       } catch (err: any) {
          setMessage(err?.response?.data?.error || "An error occurred. Please try again.");
       }
@@ -47,7 +47,7 @@ const AdminLogin = () => {
             />
             <button
                type="submit"
-               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer transition"
             >
                Login
             </button>

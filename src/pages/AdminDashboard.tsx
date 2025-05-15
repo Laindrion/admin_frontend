@@ -1,10 +1,10 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Button } from '@/components/ui/button';
-import { Navigate } from 'react-router-dom';
+import React from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { Button } from "@/components/ui/button";
+import { Navigate } from "react-router-dom";
 
-import TiptapEditor from '@/components/ui/editor';
+import TiptapEditor from "@/components/ui/editor";
 
 const AdminDashboard = () => {
    const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
@@ -49,13 +49,13 @@ const AdminDashboard = () => {
 
          window.location.href = "/admin/login";
       } catch (err) {
-         console.error('Logout failed:', err);
+         console.error("Logout failed:", err);
       }
    }
 
    // 🔐 Check session on component load
    useEffect(() => {
-      axios.get('http://localhost:3001/api/auth/check', {
+      axios.get("http://localhost:3001/api/auth/check", {
          withCredentials: true,
       })
          .then(res => {
