@@ -1,10 +1,10 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Navigate } from "react-router-dom";
 
-import TiptapEditor from "@/components/ui/editor";
+import TiptapEditor, { TiptapEditorRef } from "@/components/ui/editor";
 
 const AdminDashboard = () => {
    const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
@@ -33,15 +33,26 @@ const AdminDashboard = () => {
             },
          });
 
+         // ✅ Clear all fieldss
          setMessage(res.data.message);
          setTitle("");
          setShortDescription("");
-         setContent("");
          setImage(null);
+         /*    setContent(""); */
       } catch (err: any) {
          setMessage(err?.response?.data?.error || "Upload failed");
       }
    };
+
+   const handleLogout = async () => {
+      try {
+         await axios.post("http://localhost:3001/api/auth/logout", {}, { withCredentials: true });
+
+         window.location.href = "/admin/login";
+      } catch (err) {
+         console.error("Logout failed:", err);
+      }
+   }
 
    // 🔐 Check session on component load
    useEffect(() => {
@@ -103,7 +114,12 @@ const AdminDashboard = () => {
             </Button>
          </form>
 
-
+         <Button
+            onClick={handleLogout}
+            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 mt-4 mb-4 cursor-pointer"
+         >
+            Logout
+         </Button>
       </div>
    )
 }

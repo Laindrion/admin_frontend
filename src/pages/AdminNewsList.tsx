@@ -25,6 +25,9 @@ const AdminNewsList = () => {
 
    const [editImage, setEditImage] = useState<File | null>(null);
 
+   const [currentPage, setCurrentPage] = useState(1);
+   const [totalPages, setTotalPages] = useState(1);
+
    useEffect(() => {
       // Check log in
       axios.get("http://localhost:3001/api/auth/check", {
@@ -37,11 +40,14 @@ const AdminNewsList = () => {
    useEffect(() => {
       if (isLoggedIn) {
          axios.get("http://localhost:3001/api/news")
-            .then(res => setNewsList(res.data))
+            .then(res => {
+               setNewsList(res.data.items);
+               setTotalPages(res.data.totalPages);
+            })
             .catch(err => console.error("Failed to fetch news", err))
             .finally(() => setLoading(false));
       }
-   }, [isLoggedIn]);
+   }, [isLoggedIn, currentPage]);
 
    const handleDelete = async (id: number) => {
       if (!confirm("Are you sure you want to delete this news item?")) return;
@@ -201,6 +207,18 @@ const AdminNewsList = () => {
                      )}
                   </div>
                ))}
+
+               <div className="flex justify-center mt-6 gap-2 items-center">
+                  <button className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
+                     Prev
+                  </button>
+                  <span>
+                     {currentPage} of {totalPages}
+                  </span>
+                  <button className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer" disabled={currentPage === totalPages} onClick={() => setCurrentPage((prev) => prev + 1)}>
+                     Next
+                  </button>
+               </div>
             </div>
          )}
       </div>
