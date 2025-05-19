@@ -10,13 +10,7 @@ export type TiptapEditorRef = {
    getContent: () => string;
 }
 
-const TiptapEditor = forwardRef<TiptapEditorRef, {
-   content: string,
-   setContent: (html: string) => void;
-}>(({
-   content,
-   setContent,
-}, ref) => {
+const TiptapEditor = forwardRef<TiptapEditorRef, { content: string, setContent: (html: string) => void; }>(({ content, setContent, }, ref) => {
    const editor = useEditor({
       extensions: [
          StarterKit,

@@ -6,8 +6,15 @@ import { Button } from "@/components/ui/button";
 
 type NewsItem = {
    id: number;
-   title: string;
-   shortDescription: string;
+   title_en: string;
+   title_ru: string;
+   title_uz: string;
+   shortDescription_en: string;
+   shortDescription_ru: string;
+   shortDescription_uz: string;
+   content_en: string;
+   content_ru: string;
+   content_uz: string;
    imagePath: string;
    content: string;
    createdAt: string;
@@ -19,14 +26,37 @@ const AdminNewsList = () => {
    const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
    const [editingId, setEditId] = useState<number | null>(null);
-   const [editTitle, setEditTitle] = useState("");
-   const [editDesc, setEditDesc] = useState("");
-   const [editContent, setEditContent] = useState("");
+
+   const [editTitle_en, setEditTitle_en] = useState("");
+   const [editTitle_ru, setEditTitle_ru] = useState("");
+   const [editTitle_uz, setEditTitle_uz] = useState("");
+
+   const [editDesc_en, setEditDesc_en] = useState("");
+   const [editDesc_ru, setEditDesc_ru] = useState("");
+   const [editDesc_uz, setEditDesc_uz] = useState("");
+
+   const [editContent_en, setEditContent_en] = useState("");
+   const [editContent_ru, setEditContent_ru] = useState("");
+   const [editContent_uz, setEditContent_uz] = useState("");
 
    const [editImage, setEditImage] = useState<File | null>(null);
 
    const [currentPage, setCurrentPage] = useState(1);
    const [totalPages, setTotalPages] = useState(1);
+
+   const [selectedLang, setSelectedLang] = useState<"en" | "ru" | "uz">("en");
+
+   const [formData, setFormData] = useState({
+      title_en: "",
+      title_ru: "",
+      title_uz: "",
+      shortDescription_en: "",
+      shortDescription_ru: "",
+      shortDescription_uz: "",
+      content_en: "",
+      content_ru: "",
+      content_uz: "",
+   })
 
    useEffect(() => {
       // Check log in
@@ -66,18 +96,36 @@ const AdminNewsList = () => {
 
    const startEdit = (news: NewsItem) => {
       setEditId(news.id);
-      setEditTitle(news.title);
-      setEditDesc(news.shortDescription);
-      setEditContent(news.content);
+
+      setEditTitle_en(news.title_en);
+      setEditTitle_ru(news.title_ru);
+      setEditTitle_uz(news.title_uz);
+
+      setEditDesc_en(news.shortDescription_en);
+      setEditDesc_ru(news.shortDescription_ru);
+      setEditDesc_uz(news.shortDescription_uz);
+
+      setEditContent_en(news.content_en);
+      setEditContent_ru(news.content_ru);
+      setEditContent_uz(news.content_uz);
    }
 
    const handleSave = async (id: number) => {
 
       try {
          const formData = new FormData();
-         formData.append("title", editTitle);
-         formData.append("shortDescription", editDesc);
-         formData.append("content", editContent);
+
+         formData.append("title_en", editTitle_en);
+         formData.append("title_ru", editTitle_ru);
+         formData.append("title_uz", editTitle_uz);
+
+         formData.append("shortDescription_en", editDesc_en);
+         formData.append("shortDescription_ru", editDesc_ru);
+         formData.append("shortDescription_uz", editDesc_uz);
+
+         formData.append("content_en", editContent_en);
+         formData.append("content_ru", editContent_ru);
+         formData.append("content_uz", editContent_uz);
 
          if (editImage) formData.append("image", editImage);
 
@@ -93,12 +141,19 @@ const AdminNewsList = () => {
                item.id === id
                   ? {
                      ...item,
-                     title: editTitle,
-                     shortDescription: editDesc,
-                     imagePath: editImage ? `/uploads${editImage.name}` : item.imagePath,
-                     content: editContent
+                     title_en: editTitle_en,
+                     title_ru: editTitle_ru,
+                     title_uz: editTitle_uz,
+                     shortDescription_en: editDesc_en,
+                     shortDescription_ru: editDesc_ru,
+                     shortDescription_uz: editDesc_uz,
+                     content_en: editContent_en,
+                     content_ru: editContent_ru,
+                     content_uz: editContent_uz,
+                     imagePath: editImage ? `/uploads/${editImage.name}` : item.imagePath,
                   } : item));
 
+         // Reset states
          setEditImage(null);
          setEditId(null);
       } catch (err) {
@@ -127,6 +182,19 @@ const AdminNewsList = () => {
             <h2 className="text-2xl font-bold">
                Admin News Manager
             </h2>
+
+            <div className="flex gap-2 mb-4">
+               {["en", "ru", "uz"].map(lang => (
+                  <button
+                     onClick={() => setSelectedLang(lang as "en" | "ru" | "uz")}
+                     className={`px-4 py-1 rounded ${selectedLang === lang ? "bg-blue-600 text-white" : "bg-gray-200"}`}
+                  >
+                     {lang.toUpperCase()}
+                  </button>
+               ))
+
+               }
+            </div>
 
             <div className="flex gap-4 items-center">
                <Link to={"/admin/create-news"}>
@@ -161,15 +229,25 @@ const AdminNewsList = () => {
                            />
                            <input
                               type="text"
-                              value={editTitle}
-                              onChange={(e) => setEditTitle(e.target.value)}
+                              value={formData[`title_${selectedLang}`]}
+                              placeholder="Title"
+                              onChange={(e) => setFormData({ ...formData, [`title_${selectedLang}`]: e.target.value })}
                               className="w-full border p-2 mb-2 rounded"
                            />
 
-                           <textarea value={editDesc} onChange={(e) => setEditDesc(e.target.value)} className="w-full border p-2 mb-2 rounded">
-                           </textarea>
+                           <textarea
+                              value={formData[`shortDescription_${selectedLang}`]}
+                              placeholder="Short Description"
+                              onChange={(e) => setFormData({ ...formData, [`shortDescription_${selectedLang}`]: e.target.value })}
+                              className="w-full border p-2 mb-2 rounded" />
 
-                           <TiptapEditor content={editContent} setContent={setEditContent} />
+                           <TiptapEditor
+                              content={formData[`content_${selectedLang}`]}
+                              setContent={(val: string) => {
+                                 setFormData((prev) => ({ ...prev, [`content_${selectedLang}`]: val }))
+                              }}
+
+                           />
 
                            <button
                               onClick={() => handleSave(news.id)}
