@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import TiptapEditor from "@/components/ui/editor";
 import type { TiptapEditorRef } from "@/components/ui/editor";
@@ -32,6 +33,8 @@ const AdminDashboard = () => {
    const [contentRu, setContentRu] = useState("");
    const [contentUz, setContentUz] = useState("");
 
+   /* Use Navigate */
+   const navigate = useNavigate();
 
    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -71,6 +74,9 @@ const AdminDashboard = () => {
          setMessage(res.data.message);
          setImage(null);
          editorRef.current?.clear();
+
+         /* Navigate to the news-list page */
+         navigate("/admin/news-list");
       } catch (err: any) {
          setMessage(err?.response?.data?.error || "Upload failed");
       }
@@ -97,7 +103,7 @@ const AdminDashboard = () => {
 
    return (
       <div className="max-w-xl mx-auto mt-10 p-4 border rounded-xl shadow">
-         <div className="flex">
+         <div className="flex justify-between">
             <h2 className="text-2xl font-bold mb-4">
                Create News
             </h2>
@@ -107,7 +113,7 @@ const AdminDashboard = () => {
                   <button
                      key={lang}
                      type="button"
-                     className={`px-4 py-2 rounded ${activeLang === lang ? "bg-blue-600 text-white" : "bg-gray-200"}`}
+                     className={`px-4 py-2 rounded cursor-pointer ${activeLang === lang ? "bg-blue-600 text-white" : "bg-gray-200"}`}
                      onClick={() => setActiveLang(lang as "en" | "ru" | "uz")}
                   >
                      {lang.toUpperCase()}
@@ -153,9 +159,12 @@ const AdminDashboard = () => {
             ></textarea>
 
             <TiptapEditor
+
+               key={activeLang}
                content={
                   activeLang === "en" ? contentEn : activeLang === "ru" ? contentRu : contentUz
                }
+
                setContent={(val) => {
                   if (activeLang === "en") setContentEn(val);
                   else if (activeLang === "ru") setContentRu(val);

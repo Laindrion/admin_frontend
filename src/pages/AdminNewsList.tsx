@@ -108,6 +108,8 @@ const AdminNewsList = () => {
       setEditContent_en(news.content_en);
       setEditContent_ru(news.content_ru);
       setEditContent_uz(news.content_uz);
+
+      setEditImage(null);
    }
 
    const handleSave = async (id: number) => {
@@ -183,19 +185,6 @@ const AdminNewsList = () => {
                Admin News Manager
             </h2>
 
-            <div className="flex gap-2 mb-4">
-               {["en", "ru", "uz"].map(lang => (
-                  <button
-                     onClick={() => setSelectedLang(lang as "en" | "ru" | "uz")}
-                     className={`px-4 py-1 rounded ${selectedLang === lang ? "bg-blue-600 text-white" : "bg-gray-200"}`}
-                  >
-                     {lang.toUpperCase()}
-                  </button>
-               ))
-
-               }
-            </div>
-
             <div className="flex gap-4 items-center">
                <Link to={"/admin/create-news"}>
                   <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer text-sm">
@@ -221,63 +210,118 @@ const AdminNewsList = () => {
                   <div key={news.id} className="border rounded p-4 shadow">
                      {editingId === news.id ? (
                         <>
-                           <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => setEditImage(e.target.files?.[0] || null)}
-                              className="w-full cursor-pointer mb-2"
-                           />
-                           <input
-                              type="text"
-                              value={formData[`title_${selectedLang}`]}
-                              placeholder="Title"
-                              onChange={(e) => setFormData({ ...formData, [`title_${selectedLang}`]: e.target.value })}
-                              className="w-full border p-2 mb-2 rounded"
-                           />
+                           <div className="border p-4 rounded shadow bg-white space-y-4">
 
-                           <textarea
-                              value={formData[`shortDescription_${selectedLang}`]}
-                              placeholder="Short Description"
-                              onChange={(e) => setFormData({ ...formData, [`shortDescription_${selectedLang}`]: e.target.value })}
-                              className="w-full border p-2 mb-2 rounded" />
+                              {/* Language toggle */}
+                              <div className="flex gap-2">
+                                 {["en", "ru", "uz"].map((lang) => (
+                                    <button
+                                       key={lang}
+                                       type="button"
+                                       onClick={() => setSelectedLang(lang as "en" | "ru" | "uz")}
+                                       className={`px-3 py-1 rounded cursor-pointer ${selectedLang === lang ? "bg-blue-600 text-white" : "bg-gray-200"}`}
+                                    >
+                                       {lang.toUpperCase()}
+                                    </button>
+                                 ))}
+                              </div>
 
-                           <TiptapEditor
-                              content={formData[`content_${selectedLang}`]}
-                              setContent={(val: string) => {
-                                 setFormData((prev) => ({ ...prev, [`content_${selectedLang}`]: val }))
-                              }}
+                              {/* Language-specific inputs */}
+                              {selectedLang === "en" && (
+                                 <>
+                                    <input
+                                       type="text"
+                                       value={editTitle_en}
+                                       onChange={(e) => setEditTitle_en(e.target.value)}
+                                       placeholder="Title (EN)"
+                                       className="w-full border p-2 rounded"
+                                    />
+                                    <input
+                                       type="text"
+                                       value={editDesc_en}
+                                       onChange={(e) => setEditDesc_en(e.target.value)}
+                                       placeholder="Short Description (EN)"
+                                       className="w-full border p-2 rounded"
+                                    />
+                                    <TiptapEditor content={editContent_en} setContent={setEditContent_en} />
+                                 </>
+                              )}
 
-                           />
+                              {selectedLang === "ru" && (
+                                 <>
+                                    <input
+                                       type="text"
+                                       value={editTitle_ru}
+                                       onChange={(e) => setEditTitle_ru(e.target.value)}
+                                       placeholder="Title (RU)"
+                                       className="w-full border p-2 rounded"
+                                    />
+                                    <input
+                                       type="text"
+                                       value={editDesc_ru}
+                                       onChange={(e) => setEditDesc_ru(e.target.value)}
+                                       placeholder="Short Description (RU)"
+                                       className="w-full border p-2 rounded"
+                                    />
+                                    <TiptapEditor content={editContent_ru} setContent={setEditContent_ru} />
+                                 </>
+                              )}
 
-                           <button
-                              onClick={() => handleSave(news.id)}
-                              className="bg-green-600 text-white px-3 py-2 mr-2 rounded hover:bg-green-700 cursor-pointer"
-                           >
-                              Save
-                           </button>
+                              {selectedLang === "uz" && (
+                                 <>
+                                    <input
+                                       type="text"
+                                       value={editTitle_uz}
+                                       onChange={(e) => setEditTitle_uz(e.target.value)}
+                                       placeholder="Title (UZ)"
+                                       className="w-full border p-2 rounded"
+                                    />
+                                    <input
+                                       type="text"
+                                       value={editDesc_uz}
+                                       onChange={(e) => setEditDesc_uz(e.target.value)}
+                                       placeholder="Short Description (UZ)"
+                                       className="w-full border p-2 rounded"
+                                    />
+                                    <TiptapEditor content={editContent_uz} setContent={setEditContent_uz} />
+                                 </>
+                              )}
 
-                           <button
-                              onClick={() => { setEditId(null); }}
-                              className="bg-gray-300 text-white px-3 py-2 rounded cursor-pointer"
-                           >
-                              Cancel
-                           </button>
+                              {/* Image preview + upload */}
+                              <div>
+                                 <img
+                                    src={`http://localhost:3001${news.imagePath}`}
+                                    alt="Preview"
+                                    className="w-40 h-40 object-cover rounded mb-2"
+                                 />
+                                 <input type="file" onChange={(e) => setEditImage(e.target.files?.[0] || null)} />
+                              </div>
+
+                              {/* Save button */}
+                              <button
+                                 onClick={() => handleSave(news.id)}
+                                 className="px-4 py-2 bg-green-600 text-white rounded mr-5 cursor-pointer"
+                              >
+                                 Save
+                              </button>
+
+                              {/* Cancel button */}
+                              <button
+                                 onClick={() => { setEditId(null); }}
+                                 className="bg-gray-300 text-white px-3 py-2 rounded cursor-pointer"
+                              >
+                                 Cancel
+                              </button>
+                           </div>
                         </>
                      ) : (
                         <>
-                           <img src={`http://localhost:3001${news.imagePath}`} alt={news.title} className="full max-h-48 object-cover mb-2 rounded" />
-
-                           <h3 className="text-xl font-semibold">
-                              {news.title}
-                           </h3>
-
-                           <button
-                              onClick={() => startEdit(news)}
-                              className="mt-3 bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 mr-2 cursor-pointer"
-                           >
+                           <h2 className="text-xl font-semibold">{news.title_en}</h2>
+                           <p className="text-gray-700">{news.shortDescription_en}</p>
+                           <img src={`http://localhost:3001${news.imagePath}`} alt="Preview" className="w-40 h-40 object-cover rounded" />
+                           <button onClick={() => startEdit(news)} className="px-4 py-2 bg-blue-500 text-white rounded mr-3 cursor-pointer">
                               Edit
                            </button>
-
                            <button onClick={() => handleDelete(news.id)} className="mt-3 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 cursor-pointer">
                               Delete
                            </button>
